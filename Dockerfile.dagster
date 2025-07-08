@@ -2,12 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /opt/dagster/app
 
-COPY dagster_requirements.txt ./
+COPY requirements.txt ./
 
-RUN pip install --no-cache-dir -r dagster_requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-
-COPY dbtpostgres ./dbtpostgres
 COPY __init__.py ./
 COPY repository.py ./
 COPY workspace.yaml ./

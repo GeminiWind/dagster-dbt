@@ -1,6 +1,0 @@
-dagster==1.9.12
-dagster-dbt==0.25.12
-dagit==1.9.12
-dbt-core==1.7.5
-dbt-postgres==1.7.5
-psycopg2-binary==2.9.10 

@@ -15,12 +15,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  
 
-  dbt:
-    container_name: dbt
-    build: .
-    volumes:
-      - ./:/usr/src/dbt
-    entrypoint: ["tail", "-f", "/dev/null"]  # Keeps container running for interactive use
+  # dbt:
+  #   container_name: dbt
+  #   build: .
+  #   volumes:
+  #     - ./:/usr/src/dbt
+  #   entrypoint: ["tail", "-f", "/dev/null"]  # Keeps container running for interactive use
 
   dagster:
     build:
@@ -31,6 +31,8 @@ services:
     depends_on:
       - postgres
     working_dir: /opt/dagster/app/
+    volumes:
+      - ./dbtpostgres:/opt/dagster/app/dbtpostgres
     ports:
       - "3000:3000"
     command: ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "3000"]
@@ -44,6 +46,8 @@ services:
     depends_on:
       - dagster
     working_dir: /opt/dagster/app
+    volumes:
+      - ./dbtpostgres:/opt/dagster/app/dbtpostgres
     ports:
       - "8080:8080"
     environment:
