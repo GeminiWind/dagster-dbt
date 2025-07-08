@@ -5,13 +5,37 @@ This project demonstrates how to orchestrate a dbt (Data Build Tool) project usi
 ## Project Structure
 
 ```
-├── dbtpostgres/           # Your dbt project (models, profiles, etc.)
-├── dagster/               # Dagster repository, workspace, and code
-├── Dockerfile.dagster     # Dockerfile for Dagster user code server
-├── Dockerfile.dagit       # Dockerfile for Dagit UI
-├── docker-compose.yml     # Docker Compose configuration
-├── requirements.txt       # Python dependencies for dbt and Dagster
-└── README.md              # This file
+├── dbtpostgres/           # Your dbt project (models, profiles, macros, etc.)
+│   ├── analyses/
+│   ├── dbt_packages/
+│   ├── logs/
+│   ├── macros/
+│   ├── models/
+│   │   └── staging/
+│   │       ├── stg_products.sql
+│   │       ├── stg_products.yml
+│   │       ├── stg_users.sql
+│   │       └── stg_users.yml
+│   ├── profiles/         # dbt profiles (contains profiles.yml)
+│   ├── seeds/
+│   ├── snapshots/
+│   ├── tests/
+│   ├── venv/
+│   ├── dbt_project.yml
+│   ├── profiles.yml
+│   └── README.md
+├── scripts/
+│   └── build-dbt.sh      # Script to run dbt build in containers
+├── Dockerfile            # Base Dockerfile
+├── Dockerfile.dagster    # Dockerfile for Dagster user code server
+├── Dockerfile.dagit      # Dockerfile for Dagit UI
+├── docker-compose.yml    # Docker Compose configuration
+├── init.sql              # Postgres initialization script
+├── repository.py         # Dagster repository and asset definitions
+├── requirements.txt      # Python dependencies for dbt and Dagster
+├── workspace.yaml        # Dagster workspace configuration
+├── __init__.py
+└── README.md             # This file
 ```
 
 ## Prerequisites
@@ -72,3 +96,32 @@ This project demonstrates how to orchestrate a dbt (Data Build Tool) project usi
 - [dbt](https://www.getdbt.com/)
 - [Dagster](https://dagster.io/)
 - [Docker](https://www.docker.com/) 
+
+## Running dbt build in Docker containers
+
+A helper script is provided to run `dbt build` inside your Dagster/Dagit containers. This is useful for materializing your dbt assets from within the running containers.
+
+### Usage
+
+```bash
+bash scripts/build-dbt.sh
+```
+
+The script will:
+- Attempt to run `dbt build` in both the `dagit` and `dagster` containers (if they are running).
+- Print a warning if a container is not running and skip it.
+- Execute `dbt build` in the `/opt/dagster/app/dbtpostgres` directory inside each container.
+
+### Notes
+- Make sure your containers are running before executing the script.
+- The script is located at `scripts/build-dbt.sh`.
+- You can modify the container names or dbt project path in the script if your setup is different. 
+
+### Additional Notes
+
+- The `dagster/` directory is no longer present; Dagster code is now in `repository.py` at the project root.
+- The `scripts/build-dbt.sh` script will run `dbt build` in both `dagit` and `dagster` containers if they are running.
+- All dbt project files and configuration are under `dbtpostgres/`.
+- The `workspace.yaml` points Dagster to `repository.py` for asset/job definitions.
+
+--- 
